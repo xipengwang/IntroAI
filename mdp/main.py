@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
+import sys
+import tkinter as tk
+from tkinter import *
 import numpy as np
+import random
 
 class MDP(object):
     """
@@ -22,6 +26,7 @@ You receive a reward of 1 if you reach the goal, and zero otherwise.
         self.P = {0: {0: [(0.1, 0, 0.0), (0.8, 0, 0.0), (0.1, 4, 0.0)], 1: [(0.1, 0, 0.0), (0.8, 4, 0.0), (0.1, 1, 0.0)], 2: [(0.1, 4, 0.0), (0.8, 1, 0.0), (0.1, 0, 0.0)], 3: [(0.1, 1, 0.0), (0.8, 0, 0.0), (0.1, 0, 0.0)]}, 1: {0: [(0.1, 1, 0.0), (0.8, 0, 0.0), (0.1, 5, 0.0)], 1: [(0.1, 0, 0.0), (0.8, 5, 0.0), (0.1, 2, 0.0)], 2: [(0.1, 5, 0.0), (0.8, 2, 0.0), (0.1, 1, 0.0)], 3: [(0.1, 2, 0.0), (0.8, 1, 0.0), (0.1, 0, 0.0)]}, 2: {0: [(0.1, 2, 0.0), (0.8, 1, 0.0), (0.1, 6, 0.0)], 1: [(0.1, 1, 0.0), (0.8, 6, 0.0), (0.1, 3, 0.0)], 2: [(0.1, 6, 0.0), (0.8, 3, 0.0), (0.1, 2, 0.0)], 3: [(0.1, 3, 0.0), (0.8, 2, 0.0), (0.1, 1, 0.0)]}, 3: {0: [(0.1, 3, 0.0), (0.8, 2, 0.0), (0.1, 7, 0.0)], 1: [(0.1, 2, 0.0), (0.8, 7, 0.0), (0.1, 3, 0.0)], 2: [(0.1, 7, 0.0), (0.8, 3, 0.0), (0.1, 3, 0.0)], 3: [(0.1, 3, 0.0), (0.8, 3, 0.0), (0.1, 2, 0.0)]}, 4: {0: [(0.1, 0, 0.0), (0.8, 4, 0.0), (0.1, 8, 0.0)], 1: [(0.1, 4, 0.0), (0.8, 8, 0.0), (0.1, 5, 0.0)], 2: [(0.1, 8, 0.0), (0.8, 5, 0.0), (0.1, 0, 0.0)], 3: [(0.1, 5, 0.0), (0.8, 0, 0.0), (0.1, 4, 0.0)]}, 5: {0: [(1.0, 5, 0)], 1: [(1.0, 5, 0)], 2: [(1.0, 5, 0)], 3: [(1.0, 5, 0)]}, 6: {0: [(0.1, 2, 0.0), (0.8, 5, 0.0), (0.1, 10, 0.0)], 1: [(0.1, 5, 0.0), (0.8, 10, 0.0), (0.1, 7, 0.0)], 2: [(0.1, 10, 0.0), (0.8, 7, 0.0), (0.1, 2, 0.0)], 3: [(0.1, 7, 0.0), (0.8, 2, 0.0), (0.1, 5, 0.0)]}, 7: {0: [(1.0, 7, 0)], 1: [(1.0, 7, 0)], 2: [(1.0, 7, 0)], 3: [(1.0, 7, 0)]}, 8: {0: [(0.1, 4, 0.0), (0.8, 8, 0.0), (0.1, 12, 0.0)], 1: [(0.1, 8, 0.0), (0.8, 12, 0.0), (0.1, 9, 0.0)], 2: [(0.1, 12, 0.0), (0.8, 9, 0.0), (0.1, 4, 0.0)], 3: [(0.1, 9, 0.0), (0.8, 4, 0.0), (0.1, 8, 0.0)]}, 9: {0: [(0.1, 5, 0.0), (0.8, 8, 0.0), (0.1, 13, 0.0)], 1: [(0.1, 8, 0.0), (0.8, 13, 0.0), (0.1, 10, 0.0)], 2: [(0.1, 13, 0.0), (0.8, 10, 0.0), (0.1, 5, 0.0)], 3: [(0.1, 10, 0.0), (0.8, 5, 0.0), (0.1, 8, 0.0)]}, 10: {0: [(0.1, 6, 0.0), (0.8, 9, 0.0), (0.1, 14, 0.0)], 1: [(0.1, 9, 0.0), (0.8, 14, 0.0), (0.1, 11, 0.0)], 2: [(0.1, 14, 0.0), (0.8, 11, 0.0), (0.1, 6, 0.0)], 3: [(0.1, 11, 0.0), (0.8, 6, 0.0), (0.1, 9, 0.0)]}, 11: {0: [(1.0, 11, 0)], 1: [(1.0, 11, 0)], 2: [(1.0, 11, 0)], 3: [(1.0, 11, 0)]}, 12: {0: [(1.0, 12, 0)], 1: [(1.0, 12, 0)], 2: [(1.0, 12, 0)], 3: [(1.0, 12, 0)]}, 13: {0: [(0.1, 9, 0.0), (0.8, 12, 0.0), (0.1, 13, 0.0)], 1: [(0.1, 12, 0.0), (0.8, 13, 0.0), (0.1, 14, 0.0)], 2: [(0.1, 13, 0.0), (0.8, 14, 0.0), (0.1, 9, 0.0)], 3: [(0.1, 14, 0.0), (0.8, 9, 0.0), (0.1, 12, 0.0)]}, 14: {0: [(0.1, 10, 0.0), (0.8, 13, 0.0), (0.1, 14, 0.0)], 1: [(0.1, 13, 0.0), (0.8, 14, 0.0), (0.1, 15, 1.0)], 2: [(0.1, 14, 0.0), (0.8, 15, 1.0), (0.1, 10, 0.0)], 3: [(0.1, 15, 1.0), (0.8, 10, 0.0), (0.1, 13, 0.0)]}, 15: {0: [(1.0, 15, 0)], 1: [(1.0, 15, 0)], 2: [(1.0, 15, 0)], 3: [(1.0, 15, 0)]}}
         self.nS = 16 # number of states
         self.nA = 4 # number of actions
+        self.world = {(0,0):0,(0,1):1,(0,2):1,(0,3):1,(1,0):1,(1,1):2,(1,2):1,(1,3):2,(2,0):1,(2,1):1,(2,2):1,(2,3):2,(3,0):2,(3,1):1,(3,2):1,(3,3):3}
 
 def value_iteration(mdp, gamma, nIt):
     """
@@ -116,18 +121,99 @@ def policy_iteration(mdp, gamma, nIt):
         pi_prev = pi
     return Vs, pis
 
-def printOptActions(optimalActions):
-    print("==================")
-    print("Gridworld:")
-    print("SFFF\nFHFH\nFFFH\nHFFG")
-    print("Optimal actions:")
-    for i in range(4):
-        for j in range(4):
-            print(optimalActions[i*4+j], end="")
-        print()
-    print("==================")
+colors = ['red', 'white', 'black', 'green']
+def getBlack():
+    return "black"
 
-def main():
+def getColor(r, g, b):
+    return "#%0.2X%0.2X%0.2X" % (int(r*255), int(g*255), int(b*255))
+
+class Cell():
+    def __init__(self, master, x, y, size):
+        """ Constructor of the object called by Cell(...) """
+        self.master = master
+        self.abs = x
+        self.ord = y
+        self.size= size
+
+    def draw(self):
+        """ order to the cell to draw its representation on the canvas """
+        if self.master != None :
+            vi = self.master.vi
+            pi =  self.master.pi
+            p = vi[self.ord][self.abs]
+            fill = getColor(p, 1-p, 0)
+            outline = getBlack()
+
+            xmin = self.abs * self.size
+            xmax = xmin + self.size
+            ymin = self.ord * self.size
+            ymax = ymin + self.size
+            colorIdx = self.master.mdp.world[(self.ord,self.abs)]
+            self.master.create_rectangle(xmin, ymin, xmax, ymax, fill = colors[colorIdx], outline = outline)
+            if type(pi) != type(-1):
+                action = pi[self.ord][self.abs]
+                if action == 0:
+                    self.master.create_line(xmin + self.size/2, ymin + self.size/2, xmin, ymin+self.size/2, arrow=tk.LAST)
+                elif action == 1:
+                    self.master.create_line(xmin + self.size/2, ymin + self.size/2, xmin+self.size/2, ymax, arrow=tk.LAST)
+                elif action == 2:
+                    self.master.create_line(xmin + self.size/2, ymin + self.size/2, xmax, ymin+self.size/2, arrow=tk.LAST)
+                elif action == 3:
+                    self.master.create_line(xmin + self.size/2, ymin + self.size/2, xmin+self.size/2, ymin, arrow=tk.LAST)
+            self.master.create_rectangle(xmin+self.size/4.0, ymin+self.size/4, xmax-self.size/4.0, ymax-self.size/4, fill = fill, outline = outline)
+            self.master.create_text(xmin+self.size/2, ymin+self.size/2, fill="black", font="Times "+str(int(self.master.cellSize/4))+" italic bold",text="%0.2f"%p)
+
+class CellGrid(Canvas):
+    def __init__(self, master, mdp, maxIter, vis, pis, rowNumber, columnNumber, cellSize, *args, **kwargs):
+        Canvas.__init__(self, master, width = cellSize * columnNumber , height = cellSize * rowNumber, *args, **kwargs)
+        self.score = rowNumber * columnNumber
+        self.cellSize = cellSize
+        self.mdp = mdp
+        self.vis = vis
+        self.pis = pis
+        self.maxIter = maxIter
+        self.iter = 0
+        self.vi = self.vis[self.iter].reshape(4,4)
+        self.pi = -1
+        self.grid = []
+        for row in range(rowNumber):
+            line = []
+            for column in range(columnNumber):
+                line.append(Cell(self, column, row, cellSize))
+
+            self.grid.append(line)
+
+        #bind click action
+        master.bind("<Key>", self.key)
+        self.draw()
+
+    def draw(self):
+        for row in self.grid:
+            for cell in row:
+                cell.draw()
+
+
+    def key(self, event):
+        kp = repr(event.char)
+        if (event.char == ' '):
+            if self.iter < self.maxIter:
+                self.iter += 1
+                self.vi = self.vis[self.iter].reshape(4,4)
+                self.pi = self.pis[self.iter].reshape(4,4)
+                print("Value:")
+                print(self.vi)
+                self.draw()
+            else:
+                print("Please increase maxIter number in the code")
+        if (event.char == 'q'):
+            self.master.destroy()
+
+if __name__ == "__main__" :
+    if len(sys.argv) < 2:
+        print("./main.py [value_iter, policy_iter]")
+        exit(0)
+
     mdp = MDP()
     print(mdp.__doc__)
     print("mdp.P is a two-level dict where the first key is the state and the second key is the action.")
@@ -141,14 +227,22 @@ def main():
         print("P[5][%i] =" % i, mdp.P[5][i])
 
     GAMMA = 0.95
+    ITER = 100
     # Value iteration
     actions = ["W", "S", "E", "N"]
-    Vs_VI, pis_VI = value_iteration(mdp, GAMMA, 20)
-    #QVs_VI, pis_VI =qvalue_iteration(mdp,GAMMA, 20)
-    #Vs_PI, pis_PI = policy_iteration(mdp, GAMMA, 20)
-    optimalActions = [actions[e] for e in pis_VI[-1]]
-    printOptActions(optimalActions)
-
-
-if __name__ == "__main__" :
-    main()
+    app = Tk()
+    if(sys.argv[1] == 'value_iter'):
+        Vs_VI, pis_VI = value_iteration(mdp, GAMMA, ITER)
+        grid = CellGrid(app, mdp, ITER, Vs_VI, pis_VI, 4, 4, 100)
+    elif(sys.argv[1] == 'policy_iter'):
+        Vs_PI, pis_PI = policy_iteration(mdp, GAMMA, ITER)
+        grid = CellGrid(app, mdp, ITER, Vs_PI, pis_PI, 4, 4, 100)
+    elif(sys.argv[1] == 'q_iter'):
+        print("TODO: Qvalue iteration visualization")
+        QVs_VI, pis_VI = qvalue_iteration(mdp,GAMMA, ITER)
+        exit(0)
+    else:
+        print("./main.py [value_iter, policy_iter, q_iter]")
+        exit(0)
+    grid.pack()
+    app.mainloop()
