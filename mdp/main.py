@@ -141,8 +141,11 @@ class Cell():
         if self.master != None :
             vi = self.master.vi
             pi =  self.master.pi
-            p = vi[self.ord][self.abs]
-            fill = getColor(p, 1-p, 0)
+            p = vi[self.ord*4 + self.abs]
+            if(type(p) == np.float64):
+                fill = getColor(p, 1-p, 0)
+            else:
+                fill = getColor(np.max(p), 1-np.max(p), 0)
             outline = getBlack()
 
             xmin = self.abs * self.size
@@ -151,19 +154,39 @@ class Cell():
             ymax = ymin + self.size
             colorIdx = self.master.mdp.world[(self.ord,self.abs)]
             self.master.create_rectangle(xmin, ymin, xmax, ymax, fill = colors[colorIdx], outline = outline)
-            if type(pi) != type(-1):
-                action = pi[self.ord][self.abs]
+            if(type(p) == np.float64):
+                if type(pi) != type(-1):
+                    action = pi[self.ord][self.abs]
+                    if action == 0:
+                        self.master.create_line(xmin + self.size/2, ymin + self.size/2, xmin, ymin+self.size/2, arrow=tk.LAST)
+                    elif action == 1:
+                        self.master.create_line(xmin + self.size/2, ymin + self.size/2, xmin+self.size/2, ymax, arrow=tk.LAST)
+                    elif action == 2:
+                        self.master.create_line(xmin + self.size/2, ymin + self.size/2, xmax, ymin+self.size/2, arrow=tk.LAST)
+                    elif action == 3:
+                        self.master.create_line(xmin + self.size/2, ymin + self.size/2, xmin+self.size/2, ymin, arrow=tk.LAST)
+                self.master.create_rectangle(xmin+self.size/4.0, ymin+self.size/4, xmax-self.size/4.0, ymax-self.size/4, fill = fill, outline = outline)
+                self.master.create_text(xmin+self.size/2, ymin+self.size/2, fill="black", font="Times "+str(int(self.master.cellSize/4))+" italic bold",text="%0.2f"%p)
+            else:
+                action = np.argmax(p)
                 if action == 0:
-                    self.master.create_line(xmin + self.size/2, ymin + self.size/2, xmin, ymin+self.size/2, arrow=tk.LAST)
+                    self.master.create_line(xmin + self.size/2, ymin + self.size/2, xmin+2*self.size/8, ymin+self.size/2, arrow=tk.LAST)
                 elif action == 1:
-                    self.master.create_line(xmin + self.size/2, ymin + self.size/2, xmin+self.size/2, ymax, arrow=tk.LAST)
+                    self.master.create_line(xmin + self.size/2, ymin + self.size/2, xmin+self.size/2, ymax-2*self.size/8, arrow=tk.LAST)
                 elif action == 2:
-                    self.master.create_line(xmin + self.size/2, ymin + self.size/2, xmax, ymin+self.size/2, arrow=tk.LAST)
+                    self.master.create_line(xmin + self.size/2, ymin + self.size/2, xmax-2*self.size/8, ymin+self.size/2, arrow=tk.LAST)
                 elif action == 3:
-                    self.master.create_line(xmin + self.size/2, ymin + self.size/2, xmin+self.size/2, ymin, arrow=tk.LAST)
-            self.master.create_rectangle(xmin+self.size/4.0, ymin+self.size/4, xmax-self.size/4.0, ymax-self.size/4, fill = fill, outline = outline)
-            self.master.create_text(xmin+self.size/2, ymin+self.size/2, fill="black", font="Times "+str(int(self.master.cellSize/4))+" italic bold",text="%0.2f"%p)
-
+                    self.master.create_line(xmin + self.size/2, ymin + self.size/2, xmin+self.size/2, ymin+2*self.size/8, arrow=tk.LAST)
+                for i,v in enumerate(p):
+                    if i == 0:
+                        self.master.create_text(xmin+self.size/8, ymin+self.size/2, fill="black", font="Times "+str(int(self.master.cellSize/8))+" italic bold",text="%0.2f"%v)
+                    if i == 1:
+                        self.master.create_text(xmin+self.size/2, ymax-self.size/8, fill="black", font="Times "+str(int(self.master.cellSize/8))+" italic bold",text="%0.2f"%v)
+                    if i == 2:
+                        self.master.create_text(xmax-self.size/8, ymin+self.size/2, fill="black", font="Times "+str(int(self.master.cellSize/8))+" italic bold",text="%0.2f"%v)
+                    if i == 3:
+                        self.master.create_text(xmin+self.size/2, ymin+self.size/8, fill="black", font="Times "+str(int(self.master.cellSize/8))+" italic bold",text="%0.2f"%v)
+                #print()
 class CellGrid(Canvas):
     def __init__(self, master, mdp, maxIter, vis, pis, rowNumber, columnNumber, cellSize, *args, **kwargs):
         Canvas.__init__(self, master, width = cellSize * columnNumber , height = cellSize * rowNumber, *args, **kwargs)
@@ -174,7 +197,7 @@ class CellGrid(Canvas):
         self.pis = pis
         self.maxIter = maxIter
         self.iter = 0
-        self.vi = self.vis[self.iter].reshape(4,4)
+        self.vi = self.vis[self.iter]
         self.pi = -1
         self.grid = []
         for row in range(rowNumber):
@@ -199,10 +222,8 @@ class CellGrid(Canvas):
         if (event.char == ' '):
             if self.iter < self.maxIter:
                 self.iter += 1
-                self.vi = self.vis[self.iter].reshape(4,4)
+                self.vi = self.vis[self.iter]
                 self.pi = self.pis[self.iter].reshape(4,4)
-                print("Value:")
-                print(self.vi)
                 self.draw()
             else:
                 print("Please increase maxIter number in the code")
@@ -240,7 +261,7 @@ if __name__ == "__main__" :
     elif(sys.argv[1] == 'q_iter'):
         print("TODO: Qvalue iteration visualization")
         QVs_VI, pis_VI = qvalue_iteration(mdp,GAMMA, ITER)
-        exit(0)
+        grid = CellGrid(app, mdp, ITER, QVs_VI, pis_VI, 4, 4, 100)
     else:
         print("./main.py [value_iter, policy_iter, q_iter]")
         exit(0)
