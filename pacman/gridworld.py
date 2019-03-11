@@ -204,9 +204,8 @@ def pacManActions(agent, gridWorld):
                     food[0] = x
                     food[1] = y
     if(food[0] == -1 and food[1] == -1):
-        # No more food
-        return
-
+        # No more food, then get back to origin
+        food = [0,0]
     # find the shortest path to food
     path = findShortestPath(agent.pos, food, gridWorld.w, gridWorld.h, gridWorld.walls)
     #print(path)
@@ -256,7 +255,7 @@ class GridWorld():
         self.agents.append(agent)
 
     def simulate(self):
-        if(sum(sum(self.foods)) == 0):
+        if(sum(sum(self.foods)) == 0) and self.agents[0].pos == [0,0]:
             # Clear all food
             return True
         #update foods
