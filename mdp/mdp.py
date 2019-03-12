@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+
+#EECS 492(Winter 2019) Discussion
+#xipengw@umich.edu
+
 import numpy as np
 
 class MDP(object):
