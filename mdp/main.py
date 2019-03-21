@@ -236,7 +236,7 @@ class CellGrid(Canvas):
 
 if __name__ == "__main__" :
     if len(sys.argv) < 2:
-        print("./main.py [value_iter, policy_iter]")
+        print("./main.py [value_iter, policy_iter, q_iter]")
         exit(0)
 
     mdp = MDP()
@@ -263,7 +263,6 @@ if __name__ == "__main__" :
         Vs_PI, pis_PI = policy_iteration(mdp, GAMMA, ITER)
         grid = CellGrid(app, mdp, ITER, Vs_PI, pis_PI, 4, 4, 100)
     elif(sys.argv[1] == 'q_iter'):
-        print("TODO: Qvalue iteration visualization")
         QVs_VI, pis_VI = qvalue_iteration(mdp,GAMMA, ITER)
         grid = CellGrid(app, mdp, ITER, QVs_VI, pis_VI, 4, 4, 100)
     else:
