@@ -56,6 +56,9 @@ def rl_tabular_q(mdp, alpha, gamma, epsilon, Qpi, s):
         if p <= pThresholds[i]:
             new_s = rTuple[1]
             reward = rTuple[2]
+    target = reward + gamma*np.max(Qpi[new_s])
+    newQ = (1-alpha)*Qpi[new_s][action] + alpha*target
+    Qpi[s][action] = newQ
     return new_s
 
 colors = ['red', 'white', 'black', 'green']
@@ -145,12 +148,23 @@ class CellGrid(Canvas):
         if (event.char == ' '):
             self.state = rl_tabular_q(mdp, ALPHA, GAMMA, EPSILON, self.vi, self.state)
             #check if a terminate state
-            self.draw()
             x = int(self.state % 4)
             y = int(self.state / 4)
             if(self.mdp.world[(y,x)] == 2 or self.mdp.world[(y,x)] == 3):
                 self.state = 0
-                self.draw()
+            self.draw()
+
+        if (event.char == 'n'):
+            iters = 10000
+            print("Train for another %d iters", iters)
+            for i in range(0,iters):
+                self.state = rl_tabular_q(mdp, ALPHA, GAMMA, EPSILON, self.vi, self.state)
+                x = int(self.state % 4)
+                y = int(self.state / 4)
+                if(self.mdp.world[(y,x)] == 2 or self.mdp.world[(y,x)] == 3):
+                    self.state = 0
+            self.draw()
+
         if (event.char == 'q'):
             self.master.destroy()
 
@@ -172,6 +186,6 @@ if __name__ == "__main__" :
     actions = ["W", "S", "E", "N"]
     app = Tk()
     Qpi = np.zeros([mdp.nS, mdp.nA])
-    grid = CellGrid(app, mdp, Qpi, 4, 4, 100)
+    grid = CellGrid(app, mdp, Qpi, 4, 4, 200)
     grid.pack()
     app.mainloop()

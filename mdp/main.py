@@ -258,13 +258,13 @@ if __name__ == "__main__" :
     app = Tk()
     if(sys.argv[1] == 'value_iter'):
         Vs_VI, pis_VI = value_iteration(mdp, GAMMA, ITER)
-        grid = CellGrid(app, mdp, ITER, Vs_VI, pis_VI, 4, 4, 100)
+        grid = CellGrid(app, mdp, ITER, Vs_VI, pis_VI, 4, 4, 200)
     elif(sys.argv[1] == 'policy_iter'):
         Vs_PI, pis_PI = policy_iteration(mdp, GAMMA, ITER)
-        grid = CellGrid(app, mdp, ITER, Vs_PI, pis_PI, 4, 4, 100)
+        grid = CellGrid(app, mdp, ITER, Vs_PI, pis_PI, 4, 4, 200)
     elif(sys.argv[1] == 'q_iter'):
         QVs_VI, pis_VI = qvalue_iteration(mdp,GAMMA, ITER)
-        grid = CellGrid(app, mdp, ITER, QVs_VI, pis_VI, 4, 4, 100)
+        grid = CellGrid(app, mdp, ITER, QVs_VI, pis_VI, 4, 4, 200)
     else:
         print("./main.py [value_iter, policy_iter, q_iter]")
         exit(0)
