@@ -37,13 +37,17 @@ You receive a reward of 1 if you reach the goal, and zero otherwise.
         self.nA = 4 # number of actions
         self.world = {(0,0):0,(0,1):1,(0,2):1,(0,3):1,(1,0):1,(1,1):2,(1,2):1,(1,3):2,(2,0):1,(2,1):1,(2,2):1,(2,3):2,(3,0):2,(3,1):1,(3,2):1,(3,3):3}
 
-def rl_tabular_q(mdp, alpha, gamma, epsilon, Qpi, s):
+def rl_tabular_q(mdp, alpha, gamma, epsilon, Qpi, s, userAction=None):
     #pick action
-    if(random.uniform(0,1) < epsilon):
-        #pick random action
-        action = random.randint(0, mdp.nA-1)
+    if userAction == None:
+        if(random.uniform(0,1) < epsilon):
+            #pick random action
+            action = random.randint(0, mdp.nA-1)
+        else:
+            action = np.argmax(Qpi[s])
     else:
-        action = np.argmax(Qpi[s])
+        action = userAction
+
     p = random.uniform(0,1)
     #mdp.P[state][action] is a list of tuples (probability, nextstate, reward)
     rTupleList = mdp.P[s][action];
@@ -60,7 +64,7 @@ def rl_tabular_q(mdp, alpha, gamma, epsilon, Qpi, s):
     target = reward + gamma*np.max(Qpi[new_s])
     newQ = (1-alpha)*Qpi[s][action] + alpha*target
     Qpi[s][action] = newQ
-    return new_s
+    return (new_s,action)
 
 colors = ['red', 'white', 'black', 'green']
 def getBlack():
@@ -127,6 +131,7 @@ class CellGrid(Canvas):
         self.vi = vi
         self.grid = []
         self.state = 0
+        self.iters = 0
         for row in range(rowNumber):
             line = []
             for column in range(columnNumber):
@@ -145,9 +150,54 @@ class CellGrid(Canvas):
 
 
     def key(self, event):
-        kp = repr(event.char)
+        if(event.keycode == 8124162):
+            #print("West")
+            actions = ["West", "South", "East","North"]
+            (self.state,action) = rl_tabular_q(mdp, ALPHA, GAMMA, EPSILON, self.vi, self.state, 0)
+            print("Action: %s"%actions[action])
+            #check if a terminate state
+            x = int(self.state % 4)
+            y = int(self.state / 4)
+            if(self.mdp.world[(y,x)] == 2 or self.mdp.world[(y,x)] == 3):
+                self.state = 0
+            self.draw()
+        if(event.keycode == 8189699):
+            #print("East")
+            actions = ["West", "South", "East","North"]
+            (self.state,action) = rl_tabular_q(mdp, ALPHA, GAMMA, EPSILON, self.vi, self.state,2)
+            print("Action: %s"%actions[action])
+            #check if a terminate state
+            x = int(self.state % 4)
+            y = int(self.state / 4)
+            if(self.mdp.world[(y,x)] == 2 or self.mdp.world[(y,x)] == 3):
+                self.state = 0
+            self.draw()
+        if(event.keycode == 8320768):
+            #print("North")
+            actions = ["West", "South", "East","North"]
+            (self.state,action) = rl_tabular_q(mdp, ALPHA, GAMMA, EPSILON, self.vi, self.state,3)
+            print("Action: %s"%actions[action])
+            #check if a terminate state
+            x = int(self.state % 4)
+            y = int(self.state / 4)
+            if(self.mdp.world[(y,x)] == 2 or self.mdp.world[(y,x)] == 3):
+                self.state = 0
+            self.draw()
+        if(event.keycode == 8255233):
+            #print("South")
+            actions = ["West", "South", "East","North"]
+            (self.state,action) = rl_tabular_q(mdp, ALPHA, GAMMA, EPSILON, self.vi, self.state,1)
+            print("Action: %s"%actions[action])
+            #check if a terminate state
+            x = int(self.state % 4)
+            y = int(self.state / 4)
+            if(self.mdp.world[(y,x)] == 2 or self.mdp.world[(y,x)] == 3):
+                self.state = 0
+            self.draw()
         if (event.char == ' '):
-            self.state = rl_tabular_q(mdp, ALPHA, GAMMA, EPSILON, self.vi, self.state)
+            actions = ["West", "South", "East","North"]
+            (self.state,action) = rl_tabular_q(mdp, ALPHA, GAMMA, EPSILON, self.vi, self.state)
+            print("Action: %s"%actions[action])
             #check if a terminate state
             x = int(self.state % 4)
             y = int(self.state / 4)
@@ -156,10 +206,11 @@ class CellGrid(Canvas):
             self.draw()
 
         if (event.char == 'n'):
-            iters = 10000
-            print("Train for another %d iters", iters)
-            for i in range(0,iters):
-                self.state = rl_tabular_q(mdp, ALPHA, GAMMA, EPSILON, self.vi, self.state)
+            steps = 10000
+            self.iters += steps
+            print("Total %d iters: %f", self.iters, np.max([0.1, 1.0*EPSILON*steps/self.iters]))
+            for i in range(0, steps):
+                (self.state,action) = rl_tabular_q(mdp, ALPHA, GAMMA, np.max([0.1, 1.0*EPSILON*steps/self.iters]), self.vi, self.state)
                 x = int(self.state % 4)
                 y = int(self.state / 4)
                 if(self.mdp.world[(y,x)] == 2 or self.mdp.world[(y,x)] == 3):
