@@ -10,7 +10,7 @@ import numpy as np
 import random
 import time
 
-GAMMA = 0.95
+GAMMA = 0.9
 ALPHA = 0.1
 EPSILON = 0.5
 
@@ -56,8 +56,9 @@ def rl_tabular_q(mdp, alpha, gamma, epsilon, Qpi, s):
         if p <= pThresholds[i]:
             new_s = rTuple[1]
             reward = rTuple[2]
+            break
     target = reward + gamma*np.max(Qpi[new_s])
-    newQ = (1-alpha)*Qpi[new_s][action] + alpha*target
+    newQ = (1-alpha)*Qpi[s][action] + alpha*target
     Qpi[s][action] = newQ
     return new_s
 
