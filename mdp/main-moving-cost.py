@@ -236,8 +236,8 @@ class CellGrid(Canvas):
             self.master.destroy()
 
 if __name__ == "__main__" :
-    if len(sys.argv) < 2:
-        print("./main.py [value_iter, policy_iter, q_iter]")
+    if len(sys.argv) < 3:
+        print("./main.py [value_iter, policy_iter, q_iter] moving-cost")
         exit(0)
 
     mdp = MDP()
@@ -254,7 +254,7 @@ if __name__ == "__main__" :
 
     GAMMA = 0.95
     ITER = 100
-    MOVING_COST = 0.1
+    MOVING_COST = float(sys.argv[2])
     for s in range(mdp.nS):
         for a in range(mdp.nA):
             for e in mdp.P[s][a]:
