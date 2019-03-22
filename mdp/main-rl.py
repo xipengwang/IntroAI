@@ -12,7 +12,8 @@ import time
 
 GAMMA = 0.9
 ALPHA = 0.1
-EPSILON = 0.5
+EPSILON = 0.4
+MOVING_COST = 0.1
 
 class MDP(object):
     """
@@ -59,10 +60,15 @@ def rl_tabular_q(mdp, alpha, gamma, epsilon, Qpi, s, userAction=None):
     for i, rTuple in enumerate(rTupleList):
         if p <= pThresholds[i]:
             new_s = rTuple[1]
-            reward = rTuple[2]
+            reward = rTuple[2] - MOVING_COST
             break
     target = reward + gamma*np.max(Qpi[new_s])
     newQ = (1-alpha)*Qpi[s][action] + alpha*target
+    #print(reward)
+    #print(np.max(Qpi[new_s]))
+    #print(gamma*np.max(Qpi[new_s]))
+    #print(Qpi[s][action])
+    #print(newQ)
     Qpi[s][action] = newQ
     return (new_s,action)
 
@@ -206,7 +212,7 @@ class CellGrid(Canvas):
             self.draw()
 
         if (event.char == 'n'):
-            steps = 10000
+            steps = 50000
             self.iters += steps
             print("Total %d iters: %f", self.iters, np.max([0.1, 1.0*EPSILON*steps/self.iters]))
             for i in range(0, steps):
