@@ -2,10 +2,12 @@
 import enchant
 import sys
 
-def checkCondition(solution, position):
+def checkCondition(solution, position, unique):
+    if (unique):
+        return len(solution[0:position+1]) == len(set(solution[0:position+1]))
     return True
 
-def solveCPS(values, size, checkCondition):
+def solveCPS(values, size, checkCondition, unique):
     """Finds a solution to a backtracking problem.
 
     values     -- a sequence of values to try, in order.
@@ -19,7 +21,7 @@ def solveCPS(values, size, checkCondition):
     def extend_solution(position):
         for value in values:
             solution[position] = value
-            if not checkCondition(solution, position):
+            if not checkCondition(solution, position, unique):
                 continue
             if position >= size-1 or extend_solution(position+1):
                 solutions.append(solution.copy())
@@ -29,7 +31,11 @@ def solveCPS(values, size, checkCondition):
 
 solutions = []
 values = sys.argv[2].split(" ");
-solutions = solveCPS(values, int(sys.argv[1]), checkCondition)
+unique = True
+if(len(sys.argv) > 3):
+    unique = False
+
+solutions = solveCPS(values, int(sys.argv[1]), checkCondition, unique)
 d = enchant.Dict("en_US")
 words = set()
 for s in solutions:
