@@ -8,6 +8,7 @@ import tkinter as tk
 from tkinter import *
 import numpy as np
 import random
+import time
 
 GAMMA = 0.95
 ALPHA = 0.1
@@ -40,7 +41,7 @@ def rl_tabular_q(mdp, alpha, gamma, epsilon, Qpi, s):
     #pick action
     if(random.uniform(0,1) < epsilon):
         #pick random action
-        action = random.randint(0,mdp.nA-1)
+        action = random.randint(0, mdp.nA-1)
     else:
         action = np.argmax(Qpi[s])
     p = random.uniform(0,1)
@@ -84,7 +85,9 @@ class Cell():
             ymax = ymin + self.size
             colorIdx = self.master.mdp.world[(self.ord,self.abs)]
             self.master.create_rectangle(xmin, ymin, xmax, ymax, fill = colors[colorIdx], outline = outline)
-            if(self.ord == self.master.state / 4 and self.abs == self.master.state % 4):
+            _x = int(self.master.state % 4)
+            _y = int(self.master.state / 4)
+            if(self.ord == _y and self.abs == _x):
                 #draw a yellow circle
                 delta = self.size / 4.0
                 self.master.create_oval(xmin + delta , ymin + delta, xmax - delta, ymax - delta, fill = "yellow", outline = 'blue')
@@ -110,6 +113,7 @@ class Cell():
                     if i == 3:
                         self.master.create_text(xmin+self.size/2, ymin+self.size/8, fill="black", font="Times "+str(int(self.master.cellSize/8))+" italic bold",text="%0.2f"%v)
                 #print()
+
 class CellGrid(Canvas):
     def __init__(self, master, mdp, vi, rowNumber, columnNumber, cellSize, *args, **kwargs):
         Canvas.__init__(self, master, width = cellSize * columnNumber , height = cellSize * rowNumber, *args, **kwargs)
@@ -141,11 +145,12 @@ class CellGrid(Canvas):
         if (event.char == ' '):
             self.state = rl_tabular_q(mdp, ALPHA, GAMMA, EPSILON, self.vi, self.state)
             #check if a terminate state
-            x = self.state % 4
-            y = self.state / 4
+            self.draw()
+            x = int(self.state % 4)
+            y = int(self.state / 4)
             if(self.mdp.world[(y,x)] == 2 or self.mdp.world[(y,x)] == 3):
                 self.state = 0
-            self.draw()
+                self.draw()
         if (event.char == 'q'):
             self.master.destroy()
 
