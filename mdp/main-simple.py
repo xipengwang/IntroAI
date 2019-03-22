@@ -163,9 +163,9 @@ class Cell():
                     self.master.create_line(xmin + self.size/2, ymin + self.size/2, xmax-2*self.size/8, ymin+self.size/2, arrow=tk.LAST)
                 for i,v in enumerate(p):
                     if i == 0:
-                        self.master.create_text(xmin+self.size/8, ymin+self.size/2, fill="black", font="Times "+str(int(self.master.cellSize/8))+" italic bold",text="%0.4f"%v)
+                        self.master.create_text(xmin+self.size/8, ymin+self.size/2, fill="black", font="Times "+str(int(self.master.cellSize/8))+" italic bold",text="%0.2f"%v)
                     if i == 1:
-                        self.master.create_text(xmax-self.size/8, ymin+self.size/2, fill="black", font="Times "+str(int(self.master.cellSize/8))+" italic bold",text="%0.4f"%v)
+                        self.master.create_text(xmax-self.size/8, ymin+self.size/2, fill="black", font="Times "+str(int(self.master.cellSize/8))+" italic bold",text="%0.2f"%v)
                 #print()
 class CellGrid(Canvas):
     def __init__(self, master, mdp, maxIter, vis, pis, rowNumber, columnNumber, cellSize, *args, **kwargs):
@@ -217,7 +217,7 @@ if __name__ == "__main__" :
 
     mdp = MDP()
     GAMMA = 0.9
-    ITER = 20
+    ITER = 100
     # Value iteration
     actions = ["W", "S", "E", "N"]
     app = Tk()
