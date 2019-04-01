@@ -156,11 +156,11 @@ def uniformCostSearch(problem):
     actions = []
     for e in problem.getSuccessors(currState):
         parents[e] = None
-        costs[e] = e[2] + costs[currState]
+        costs[e[0]] = e[2] + costs[currState]
         s.push(e, e[2])
     while not s.isEmpty():
         currState = s.pop()
-        currCost = costs[currState]
+        currCost = costs[currState[0]]
         labels[currState[0]] = 1
         if problem.isGoalState(currState[0]):
             # Found goal
@@ -173,15 +173,15 @@ def uniformCostSearch(problem):
             if e[0] in labels:
                 continue
             childCost = currCost + e[2]
-            if not e in costs:
-                s.push(e, childCost)
-                costs[e] = childCost
-                parents[e] = currState
-            else:
-                if costs[e] > childCost:
+            if e[0] in costs:
+                if costs[e[0]] > childCost:
                     s.update(e, childCost)
-                    costs[e] = childCost
+                    costs[e[0]] = childCost
                     parents[e] = currState
+            else:
+                s.push(e, childCost)
+                costs[e[0]] = childCost
+                parents[e] = currState
 
     return actions
 
