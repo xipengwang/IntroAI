@@ -4,7 +4,7 @@
 # educational purposes provided that (1) you do not distribute or publish
 # solutions, (2) you retain this notice, and (3) you provide clear
 # attribution to UC Berkeley, including a link to http://ai.berkeley.edu.
-# 
+#
 # Attribution Information: The Pacman AI projects were developed at UC Berkeley.
 # The core projects and autograders were primarily created by John DeNero
 # (denero@cs.berkeley.edu) and Dan Klein (klein@cs.berkeley.edu).
@@ -116,7 +116,32 @@ def depthFirstSearch(problem):
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    s = util.Queue()
+    parents = {}
+    labels = {}
+    currState = problem.getStartState()
+    labels[currState] = 1
+    actions = []
+    for e in problem.getSuccessors(currState):
+        parents[e] = None
+        s.push(e)
+        labels[e[0]] = 1
+    while not s.isEmpty():
+        currState = s.pop()
+        if problem.isGoalState(currState[0]):
+            # Found goal
+            while not parents[currState] == None:
+                actions.insert(0, currState[1])
+                currState = parents[currState]
+            actions.insert(0, currState[1])
+            break
+        for e in problem.getSuccessors(currState[0]):
+            if e[0] in labels:
+                continue
+            s.push(e)
+            parents[e] = currState
+            labels[e[0]] = 1
+    return actions
 
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
