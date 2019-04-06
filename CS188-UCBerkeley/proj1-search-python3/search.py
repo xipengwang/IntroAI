@@ -72,6 +72,13 @@ def tinyMazeSearch(problem):
     w = Directions.WEST
     return  [s, s, w, s, w, w, s, w]
 
+
+class Node:
+    def __init__(self, state, cost=0, path=[]):
+        self.state = state
+        self.cost = cost
+        self.path = path
+
 def depthFirstSearch(problem):
     """
     Search the deepest nodes in the search tree first.
@@ -88,102 +95,60 @@ def depthFirstSearch(problem):
     """
     "*** YOUR CODE HERE ***"
     s = util.Stack()
-    parents = {}
-    labels = {}
+    closedSet = set()
     currState = problem.getStartState()
-    labels[currState] = 1
-    actions = []
-    for e in problem.getSuccessors(currState):
-        parents[e] = None
-        s.push(e)
+    s.push(Node(currState, 0, []))
     while not s.isEmpty():
-        currState = s.pop()
-        labels[currState[0]] = 1
-        if problem.isGoalState(currState[0]):
+        currNode = s.pop()
+        closedSet.add(currNode.state)
+        if problem.isGoalState(currNode.state):
             # Found goal
-            while not parents[currState] == None:
-                actions.insert(0, currState[1])
-                currState = parents[currState]
-            actions.insert(0, currState[1])
-            break
-        for e in problem.getSuccessors(currState[0]):
-            if e[0] in labels:
+            return currNode.path
+        for successor in problem.getSuccessors(currNode.state):
+            if successor[0] in closedSet:
                 continue
-            s.push(e)
-            parents[e] = currState
-    return actions
+            s.push(Node(successor[0], successor[2], currNode.path + [successor[1]]))
+    return []
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
     s = util.Queue()
-    parents = {}
-    labels = {}
+    closedSet = set()
     currState = problem.getStartState()
-    labels[currState] = 1
-    actions = []
-    for e in problem.getSuccessors(currState):
-        parents[e] = None
-        s.push(e)
-        labels[e[0]] = 1
+    s.push(Node(currState, 0, []))
+    closedSet.add(currState)
     while not s.isEmpty():
-        currState = s.pop()
-        if problem.isGoalState(currState[0]):
+        currNode = s.pop()
+        if problem.isGoalState(currNode.state):
             # Found goal
-            while not parents[currState] == None:
-                actions.insert(0, currState[1])
-                currState = parents[currState]
-            actions.insert(0, currState[1])
-            break
-        for e in problem.getSuccessors(currState[0]):
-            if e[0] in labels:
+            return currNode.path
+        for successor in problem.getSuccessors(currNode.state):
+            if successor[0] in closedSet:
                 continue
-            s.push(e)
-            parents[e] = currState
-            labels[e[0]] = 1
-    return actions
+            s.push(Node(successor[0], successor[2], currNode.path + [successor[1]]))
+            closedSet.add(successor[0])
+    return []
 
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
     "*** YOUR CODE HERE ***"
     s = util.PriorityQueue()
-    parents = {}
-    labels = {}
-    costs = {}
+    closedSet = set()
     currState = problem.getStartState()
-    labels[currState] = 1
-    costs[currState] = 0
-    actions = []
-    for e in problem.getSuccessors(currState):
-        parents[e] = None
-        costs[e[0]] = e[2] + costs[currState]
-        s.push(e, e[2])
+    s.push(Node(currState, 0, []), 0)
     while not s.isEmpty():
-        currState = s.pop()
-        currCost = costs[currState[0]]
-        labels[currState[0]] = 1
-        if problem.isGoalState(currState[0]):
-            # Found goal
-            while not parents[currState] == None:
-                actions.insert(0, currState[1])
-                currState = parents[currState]
-            actions.insert(0, currState[1])
-            break
-        for e in problem.getSuccessors(currState[0]):
-            if e[0] in labels:
-                continue
-            childCost = currCost + e[2]
-            if e[0] in costs:
-                if costs[e[0]] > childCost:
-                    s.update(e, childCost)
-                    costs[e[0]] = childCost
-                    parents[e] = currState
-            else:
-                s.push(e, childCost)
-                costs[e[0]] = childCost
-                parents[e] = currState
-
-    return actions
+        currNode = s.pop()
+        if problem.isGoalState(currNode.state):
+            return currNode.path
+        if currNode.state in closedSet:
+            continue
+        closedSet.add(currNode.state)
+        currCost = currNode.cost
+        for successor in problem.getSuccessors(currNode.state):
+            childCost = currCost + successor[2]
+            s.push(Node(successor[0], childCost, currNode.path + [successor[1]]), childCost)
+    return []
 
 def nullHeuristic(state, problem=None):
     """
@@ -195,7 +160,22 @@ def nullHeuristic(state, problem=None):
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    s = util.PriorityQueue()
+    closedSet = set()
+    currState = problem.getStartState()
+    s.push(Node(currState, 0, []), 0)
+    while not s.isEmpty():
+        currNode = s.pop()
+        if problem.isGoalState(currNode.state):
+            return currNode.path
+        if currNode.state in closedSet:
+            continue
+        closedSet.add(currNode.state)
+        currCost = currNode.cost
+        for successor in problem.getSuccessors(currNode.state):
+            childCost = currCost + successor[2]
+            s.push(Node(successor[0], childCost, currNode.path + [successor[1]]), childCost+heuristic(successor[0], problem))
+    return []
 
 
 # Abbreviations
