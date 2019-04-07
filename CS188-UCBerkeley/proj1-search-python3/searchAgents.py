@@ -378,13 +378,26 @@ def cornersHeuristic(state, problem):
     position = state[0]
     hitCorners = state[1]
     dist = []
+    nNotReached = 0
     for i, corner in enumerate(corners):
         if not hitCorners[i]:
             dist.append(abs(corner[0] - position[0]) + abs(corner[1] - position[1]))
-    if not dist:
+            nNotReached += 1
+        else:
+            dist.append(999999999)
+    if nNotReached == 0:
         return 0
-    return max(dist)
+    ret = min(dist)
 
+    minIdx = dist.index(ret)
+    if nNotReached >= 3:
+        return ret + walls.height-3 + walls.width-3
+    else:
+        for i, corner in enumerate(corners):
+            if not hitCorners[i]:
+                if i != minIdx:
+                    ret += (abs(corner[0] - corners[minIdx][0]) + abs(corner[1] - corners[minIdx][1]))
+    return ret
 
 class AStarCornersAgent(SearchAgent):
     "A SearchAgent for FoodSearchProblem using A* and your foodHeuristic"
